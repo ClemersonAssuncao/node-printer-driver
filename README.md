@@ -561,4 +561,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Created with ❤️ for the Node.js community
-# node-printer-driver

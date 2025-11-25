@@ -1,0 +1,46 @@
+# Source files
+src/
+tests/
+examples/
+coverage/
+
+# Configuration files
+.github/
+.vscode/
+tsconfig.json
+jest.config.cjs
+
+# Documentation
+CONTRIBUTING.md
+tests/README.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Development files
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+.env
+.env.*
+node_modules/
+
+# Test artifacts
+*.test.ts
+*.spec.ts
+*.test.js
+*.spec.js
+test-document.pdf
+
+# Build artifacts
+*.tsbuildinfo
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
