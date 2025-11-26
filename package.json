@@ -41,16 +41,12 @@
     "print-pdf",
     "windows-printing"
   ],
-  "author": "",
+  "author": "ClemersonAssuncao",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": ""
   },
-  "bugs": {
-    "url": ""
-  },
-  "homepage": "",
   "dependencies": {
     "koffi": "^2.9.0"
   },
