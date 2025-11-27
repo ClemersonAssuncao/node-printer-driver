@@ -2,8 +2,9 @@
 import type { IPrinter, IPrinterManager } from '../core/interfaces';
 import { PlatformDetector } from '../services/platform-detector.service';
 import { WindowsPrinterManagerAdapter } from '../adapters/windows/windows-printer-manager.adapter';
+import { UnixPrinterManagerAdapter } from '../adapters/unix/unix-printer-manager.adapter';
 import { PDFPrinter } from '../pdf-printer';
-import { UnixPDFPrinter, UnixPrinterManager } from '../unix-printer';
+import { UnixPDFPrinter } from '../unix-printer';
 
 export class PrinterFactory {
   /**
@@ -24,7 +25,7 @@ export class PrinterFactory {
     if (PlatformDetector.isWindows()) {
       return new WindowsPrinterManagerAdapter();
     } else {
-      return new UnixPrinterManager() as any;
+      return new UnixPrinterManagerAdapter();
     }
   }
 }

@@ -81,15 +81,30 @@ export interface UnixPrintOptions {
 
 export class UnixPDFPrinter {
   private printerName: string;
+  private initialized: boolean = false;
   
   constructor(printerName?: string) {
     this.printerName = printerName || '';
+    
+    // Synchronous validation for provided printer name
+    // Note: This is a basic check - full validation happens in initialize()
+    if (printerName) {
+      // Throw immediately if printer name looks invalid
+      // Full async validation will happen on first print operation
+      if (printerName.trim().length === 0) {
+        throw new Error('Printer name cannot be empty');
+      }
+    }
   }
   
   /**
    * Initialize printer name (async because we need to query default)
    */
   async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+    
     if (!this.printerName) {
       const defaultPrinter = await UnixPrinterManager.getDefaultPrinter();
       if (!defaultPrinter) {
@@ -102,7 +117,15 @@ export class UnixPDFPrinter {
       } else {
         this.printerName = defaultPrinter;
       }
+    } else {
+      // Validate that the provided printer actually exists
+      const exists = await UnixPrinterManager.printerExists(this.printerName);
+      if (!exists) {
+        throw new Error(`Printer not found: ${this.printerName}`);
+      }
     }
+    
+    this.initialized = true;
   }
   
   /**

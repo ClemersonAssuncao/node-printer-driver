@@ -6,6 +6,7 @@ export { PrinterFactory } from './factories/printer.factory';
 
 // Re-export platform-specific implementations for backward compatibility
 export { WindowsPrinterManagerAdapter } from './adapters/windows/windows-printer-manager.adapter';
+export { UnixPrinterManagerAdapter } from './adapters/unix/unix-printer-manager.adapter';
 export { PDFPrinter as WindowsPDFPrinter } from './pdf-printer';
 export { PrinterManager as WindowsPrinterManager } from './printer-manager';
 export { UnixPDFPrinter, UnixPrinterManager } from './unix-printer';
@@ -43,26 +44,39 @@ import { PlatformDetector } from './services/platform-detector.service';
 /**
  * Cross-platform PDFPrinter - automatically uses correct implementation
  * 
+ * Note: On Unix/Linux, printer validation is async. Use the static create() method
+ * for validated printer creation, or validate manually before instantiation.
+ * 
  * @example
  * ```typescript
  * const printer = new PDFPrinter();
  * await printer.print('./document.pdf', { copies: 2, duplex: 'vertical' });
+ * 
+ * // For validated creation:
+ * const printer = await PDFPrinter.create('MyPrinter');
  * ```
  */
 export class PDFPrinter {
   private printer: any;
   
   constructor(printerName?: string) {
+    // Direct instantiation - validation happens in platform-specific implementations
+    this.printer = PrinterFactory.createPrinter(printerName);
+  }
+  
+  /**
+   * Create a PDFPrinter with validation (async for Unix compatibility)
+   */
+  static async create(printerName?: string): Promise<PDFPrinter> {
     // Validate printer exists if name provided
     if (printerName) {
       const manager = PrinterFactory.createPrinterManager();
-      const exists = manager.printerExists(printerName);
-      const printerExists = exists instanceof Promise ? false : exists; // Sync check for Windows
-      if (!printerExists) {
+      const exists = await manager.printerExists(printerName);
+      if (!exists) {
         throw new Error(`Printer not found: ${printerName}`);
       }
     }
-    this.printer = PrinterFactory.createPrinter(printerName);
+    return new PDFPrinter(printerName);
   }
   
   async print(pdfPath: string, options?: PrintOptions): Promise<void> {

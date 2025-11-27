@@ -50,9 +50,18 @@ describe('Cross-Platform Integration', () => {
       expect(printer).toBeInstanceOf(PDFPrinter);
     });
 
-    it('should create PDFPrinter with specific printer name', () => {
-      // TestPrinter doesn't exist, so this should throw
-      expect(() => new PDFPrinter('TestPrinter')).toThrow('Printer not found');
+    it('should create PDFPrinter with specific printer name', async () => {
+      // TestPrinter doesn't exist, validation should fail
+      // On Windows: constructor throws synchronously
+      // On Unix: create() throws asynchronously or print() throws on first use
+      const isWindows = os.platform() === 'win32';
+      
+      if (isWindows) {
+        expect(() => new PDFPrinter('TestPrinter')).toThrow('Printer not found');
+      } else {
+        // Unix: use async create method for validation
+        await expect(PDFPrinter.create('TestPrinter')).rejects.toThrow('Printer not found');
+      }
     });
 
     it('should have print method', () => {
@@ -168,8 +177,16 @@ describe('Cross-Platform Integration', () => {
     });
 
     it('should handle non-existent printer', async () => {
-      // Constructor validates printer existence
-      expect(() => new PDFPrinter('NonExistentPrinter_ABCDEF123456')).toThrow('Printer not found');
+      // Validation behavior differs by platform
+      const isWindows = os.platform() === 'win32';
+      
+      if (isWindows) {
+        // Windows: constructor validates synchronously
+        expect(() => new PDFPrinter('NonExistentPrinter_ABCDEF123456')).toThrow('Printer not found');
+      } else {
+        // Unix: use async create method for validation
+        await expect(PDFPrinter.create('NonExistentPrinter_ABCDEF123456')).rejects.toThrow('Printer not found');
+      }
     });
   });
 
