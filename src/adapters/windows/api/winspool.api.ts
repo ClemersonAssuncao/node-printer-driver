@@ -61,15 +61,14 @@ function defineStruct(name: string, definition: any) {
     structCache[name] = struct;
     return struct;
   } catch (error: any) {
-    // If Koffi already has this structure registered internally but not in our cache,
-    // it means another import path created it first. This can happen in test environments.
-    // We'll create a stub and cache it - Koffi will use the already-registered structure internally.
+    // If Koffi already has this structure registered, silently return a reference
+    // The structure is already registered in Koffi's internal type system
+    // We can't retrieve it directly, but Koffi will resolve it by name
     if (error?.message?.includes('Duplicate type name')) {
-      // Create a stub object that Koffi can work with
-      // The actual structure is already registered in Koffi's internal registry
-      const stub = { __koffi_type__: name, __is_duplicate__: true } as any;
-      structCache[name] = stub;
-      return stub;
+      // Instead of creating a stub, just cache the name reference
+      // Koffi can look up types by string name when needed
+      structCache[name] = name; // Cache the name string itself
+      return name; // Return name string - Koffi will resolve it
     }
     throw error;
   }
