@@ -42,15 +42,33 @@ const isWindows = os.platform() === 'win32';
 const winspool = isWindows ? koffi.load('winspool.drv') : null as any;
 const kernel32 = isWindows ? koffi.load('kernel32.dll') : null as any;
 
-// Helper to create or reuse Koffi structures (prevents "Duplicate type name" error)
+// Global cache to store Koffi structures (prevents "Duplicate type name" error on re-import)
+const structCache = (globalThis as any).__koffi_struct_cache__ || {};
+if (!(globalThis as any).__koffi_struct_cache__) {
+  (globalThis as any).__koffi_struct_cache__ = structCache;
+}
+
+// Helper to create or reuse Koffi structures
 function defineStruct(name: string, definition: any) {
+  // Return cached structure if it exists
+  if (structCache[name]) {
+    return structCache[name];
+  }
+  
+  // Create new structure and cache it
   try {
-    return koffi.struct(name, definition);
+    const struct = koffi.struct(name, definition);
+    structCache[name] = struct;
+    return struct;
   } catch (error: any) {
-    // If structure already exists, Koffi throws "Duplicate type name"
-    // In that case, just return a dummy object - the existing structure will be used
+    // If Koffi already has this structure registered internally but not in our cache,
+    // it means another import path created it. We can't retrieve it, so we'll throw.
     if (error?.message?.includes('Duplicate type name')) {
-      return {} as any; // Return dummy - existing structure will be used by Koffi internally
+      throw new Error(
+        `Structure "${name}" was already defined by Koffi in another context. ` +
+        `This usually means the module was imported multiple times in incompatible ways. ` +
+        `Please ensure consistent import paths.`
+      );
     }
     throw error;
   }
