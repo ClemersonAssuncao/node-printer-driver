@@ -1,6 +1,6 @@
 {
-  "name": "node-pdf-printer",
-  "version": "1.0.1",
+  "name": "windows-pdf-printer-native",
+  "version": "1.0.2",
   "description": "A Node.js library for printing PDF documents on Windows using native DLLs",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -47,8 +47,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/ClemersonAssuncao/windows-pdf-printer-native.git"
   },
+  "bugs": {
+    "url": "https://github.com/ClemersonAssuncao/windows-pdf-printer-native/issues"
+  },
+  "homepage": "https://github.com/ClemersonAssuncao/windows-pdf-printer-native#readme",
   "dependencies": {
     "koffi": "^2.9.0"
   },

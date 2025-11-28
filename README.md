@@ -1,4 +1,4 @@
-# Node PDF Printer
+# Windows PDF Printer Native
 
 A **production-ready**, **cross-platform** Node.js library for printing PDF documents with **native Windows API integration** and **CUPS support**. Built with **Clean Architecture** principles for maintainability, extensibility, and testability.
 
